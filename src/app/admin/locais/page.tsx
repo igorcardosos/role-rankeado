@@ -24,15 +24,15 @@ export default async function AdminLocaisPage() {
         {locais.map((local) => (
           <li
             key={local.id}
-            className="flex items-center bg-white rounded-2xl border border-gray-200 pr-2"
+            className="flex items-center bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 pr-2"
           >
             <Link
               href={`/admin/locais/${local.id}/editar`}
-              className="flex-1 min-w-0 flex items-center justify-between px-4 py-3 active:bg-gray-50"
+              className="flex-1 min-w-0 flex items-center justify-between px-4 py-3 active:bg-gray-50 dark:active:bg-gray-800"
             >
               <div className="min-w-0">
                 <p className="font-medium truncate">{local.nome}</p>
-                <p className="text-xs text-gray-500 truncate">{local.cidade}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{local.cidade}</p>
               </div>
             </Link>
             <DeleteLocalButton id={local.id} nome={local.nome} />

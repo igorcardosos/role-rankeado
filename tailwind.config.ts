@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
+  darkMode: 'class',
   content: ['./src/app/**/*.{ts,tsx}', './src/components/**/*.{ts,tsx}'],
   theme: {
     extend: {
@@ -15,6 +16,7 @@ const config: Config = {
           600: '#ea580c',
           700: '#c2410c',
           800: '#9a3412',
+          900: '#7c2d12',
         },
       },
     },

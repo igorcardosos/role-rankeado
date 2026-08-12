@@ -12,7 +12,7 @@ export default function RankingNotaList({ rows }: { rows: NotaRankingRow[] }) {
     return (
       <div className="text-center py-16">
         <p className="text-4xl mb-2">🏆</p>
-        <p className="text-gray-500">Nenhuma avaliação registrada ainda.</p>
+        <p className="text-gray-500 dark:text-gray-400">Nenhuma avaliação registrada ainda.</p>
       </div>
     );
   }
@@ -25,7 +25,7 @@ export default function RankingNotaList({ rows }: { rows: NotaRankingRow[] }) {
           <li key={row.localId}>
             <Link
               href={`/locais/${row.localId}`}
-              className={`relative flex items-center gap-3 bg-white rounded-3xl border border-gray-200 p-3 shadow-sm active:scale-[0.99] transition-transform overflow-hidden ${
+              className={`relative flex items-center gap-3 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-3 shadow-sm dark:shadow-none active:scale-[0.99] transition-transform overflow-hidden ${
                 idx === 0 ? 'ring-2 ring-brand-400 shadow-brand-100' : ''
               }`}
             >
@@ -38,7 +38,7 @@ export default function RankingNotaList({ rows }: { rows: NotaRankingRow[] }) {
                 <img
                   src={row.fotoUrl}
                   alt={row.nome}
-                  className={`w-16 h-16 rounded-2xl object-cover bg-gray-100 ${podio?.anel ?? ''}`}
+                  className={`w-16 h-16 rounded-2xl object-cover bg-gray-100 dark:bg-gray-800 ${podio?.anel ?? ''}`}
                 />
                 <span
                   className={`absolute -top-2 -left-2 flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold text-white bg-gradient-to-br ${
@@ -50,16 +50,16 @@ export default function RankingNotaList({ rows }: { rows: NotaRankingRow[] }) {
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-gray-900 truncate">{row.nome}</p>
-                <p className="text-xs text-gray-500 truncate">{row.cidade}</p>
+                <p className="font-bold text-gray-900 dark:text-gray-100 truncate">{row.nome}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{row.cidade}</p>
                 <div className="flex gap-2.5 mt-1.5 text-xs">
-                  <span className="flex items-center gap-0.5 bg-gray-50 rounded-full px-2 py-0.5 text-gray-600">
+                  <span className="flex items-center gap-0.5 bg-gray-50 dark:bg-gray-800 rounded-full px-2 py-0.5 text-gray-600 dark:text-gray-300">
                     🐟 {row.mediaPeixe.toFixed(1)}
                   </span>
-                  <span className="flex items-center gap-0.5 bg-gray-50 rounded-full px-2 py-0.5 text-gray-600">
+                  <span className="flex items-center gap-0.5 bg-gray-50 dark:bg-gray-800 rounded-full px-2 py-0.5 text-gray-600 dark:text-gray-300">
                     🥣 {row.mediaMolho.toFixed(1)}
                   </span>
-                  <span className="flex items-center gap-0.5 bg-gray-50 rounded-full px-2 py-0.5 text-gray-600">
+                  <span className="flex items-center gap-0.5 bg-gray-50 dark:bg-gray-800 rounded-full px-2 py-0.5 text-gray-600 dark:text-gray-300">
                     🍟 {row.mediaAcompanhamento.toFixed(1)}
                   </span>
                 </div>

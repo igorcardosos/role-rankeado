@@ -13,7 +13,7 @@ export default async function NovaSessaoHistoricaPage() {
   return (
     <div>
       <h1 className="text-xl font-bold mb-1">Sessão histórica</h1>
-      <p className="text-gray-500 text-sm mb-4">
+      <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
         Cadastre um rolê antigo com as notas de quem participou, sem passar pelo fluxo de votação ao vivo.
       </p>
       <HistoricoSessaoForm locais={locais} usuarios={usuarios} />

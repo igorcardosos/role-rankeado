@@ -19,11 +19,13 @@ export default function RankingTabs({
 
   return (
     <div>
-      <div className="flex gap-2 mb-4 bg-gray-100 rounded-xl p-1">
+      <div className="flex gap-2 mb-4 bg-gray-100 dark:bg-gray-900 rounded-xl p-1">
         <button
           onClick={() => setTab('nota')}
           className={`flex-1 rounded-lg py-2.5 text-sm font-bold transition-colors ${
-            tab === 'nota' ? 'bg-white shadow text-brand-600' : 'text-gray-500'
+            tab === 'nota'
+              ? 'bg-white dark:bg-gray-800 shadow text-brand-600 dark:text-brand-400'
+              : 'text-gray-500 dark:text-gray-400'
           }`}
         >
           ⭐ Nota
@@ -31,7 +33,9 @@ export default function RankingTabs({
         <button
           onClick={() => setTab('feeling')}
           className={`flex-1 rounded-lg py-2.5 text-sm font-bold transition-colors ${
-            tab === 'feeling' ? 'bg-white shadow text-brand-600' : 'text-gray-500'
+            tab === 'feeling'
+              ? 'bg-white dark:bg-gray-800 shadow text-brand-600 dark:text-brand-400'
+              : 'text-gray-500 dark:text-gray-400'
           }`}
         >
           💭 Feeling

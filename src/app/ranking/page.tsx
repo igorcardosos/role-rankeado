@@ -2,25 +2,35 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { requireUser } from '@/lib/auth';
 import { getNotaRanking, getFeelingRanking } from '@/lib/scoring';
+import { getAppConfig } from '@/lib/config';
+import { PLACEHOLDER_PHOTO_URL } from '@/lib/constants';
 import RankingTabs from '@/components/RankingTabs';
 
 export default async function RankingPage() {
   const session = await requireUser();
 
-  const [notaRows, grupoRanking, feelingVotos] = await Promise.all([
+  const [notaRows, grupoRanking, feelingVotos, { nomeApp }] = await Promise.all([
     getNotaRanking(),
     getFeelingRanking(),
     prisma.feelingVoto.findMany({
       where: { usuarioId: session.sub },
-      include: { local: true },
+      include: {
+        local: {
+          include: {
+            sessoes: { orderBy: { data: 'desc' }, take: 1, select: { fotoUrl: true } },
+          },
+        },
+      },
       orderBy: { posicaoPessoal: 'asc' },
     }),
+    getAppConfig(),
   ]);
 
   const feelingItems = feelingVotos.map((voto) => ({
     localId: voto.localId,
     nome: voto.local.nome,
     cidade: voto.local.cidade,
+    fotoUrl: voto.local.sessoes[0]?.fotoUrl ?? PLACEHOLDER_PHOTO_URL,
   }));
 
   const lider = notaRows[0];
@@ -28,10 +38,10 @@ export default async function RankingPage() {
 
   return (
     <div>
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-500 via-brand-600 to-amber-600 text-white p-5 mb-5 shadow-lg shadow-brand-200/50">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-500 via-brand-600 to-amber-600 text-white p-5 mb-5 shadow-lg shadow-brand-200/50 dark:shadow-none">
         <div className="absolute -right-6 -top-6 text-8xl opacity-20 rotate-12">🐟</div>
         <div className="relative">
-          <p className="text-xs font-semibold tracking-wide uppercase opacity-80">Rolê Rankeado</p>
+          <p className="text-xs font-semibold tracking-wide uppercase opacity-80">{nomeApp}</p>
           <h1 className="text-2xl font-extrabold mt-0.5">🏆 Ranking do grupo</h1>
 
           {lider ? (

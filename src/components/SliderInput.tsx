@@ -16,9 +16,9 @@ export default function SliderInput({ label, icon, value, max, onChange }: Props
           <span aria-hidden>{icon}</span>
           {label}
         </label>
-        <span className="text-lg font-bold text-brand-600 tabular-nums">
+        <span className="text-lg font-bold text-brand-600 dark:text-brand-400 tabular-nums">
           {value}
-          <span className="text-xs text-gray-400">/{max}</span>
+          <span className="text-xs text-gray-400 dark:text-gray-500">/{max}</span>
         </span>
       </div>
       <input

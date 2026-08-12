@@ -1,8 +1,18 @@
 import { z } from 'zod';
 import { MAX_NOTA_PEIXE, MAX_NOTA_MOLHO, MAX_NOTA_ACOMPANHAMENTO } from '@/lib/constants';
+import { normalizeTelefone } from '@/lib/phone';
+
+// Aceita o telefone formatado ou só dígitos — sempre normaliza pra dígitos
+// puros antes de guardar/comparar, então o mesmo número bate independente
+// de como foi digitado.
+const telefone = z
+  .string()
+  .trim()
+  .transform(normalizeTelefone)
+  .refine((v) => v.length >= 8 && v.length <= 15, 'Telefone inválido.');
 
 export const loginSchema = z.object({
-  telefone: z.string().trim().min(3).max(30),
+  telefone,
 });
 
 export const localCreateSchema = z.object({
@@ -54,7 +64,7 @@ export const feelingUpdateSchema = z.object({
 });
 
 export const usuarioCreateSchema = z.object({
-  telefone: z.string().trim().min(3).max(30),
+  telefone,
   nome: z.string().trim().min(1).max(120),
   papel: z.enum(['ADMIN', 'MEMBRO']).default('MEMBRO'),
 });
@@ -62,4 +72,8 @@ export const usuarioCreateSchema = z.object({
 export const usuarioUpdateSchema = z.object({
   nome: z.string().trim().min(1).max(120).optional(),
   papel: z.enum(['ADMIN', 'MEMBRO']).optional(),
+});
+
+export const appConfigUpdateSchema = z.object({
+  nomeApp: z.string().trim().min(1).max(60),
 });

@@ -11,7 +11,7 @@ export default async function NovaSessaoPage() {
   if (sessaoAberta) {
     return (
       <div className="text-center py-16">
-        <p className="text-gray-500">
+        <p className="text-gray-500 dark:text-gray-400">
           Já existe uma sessão aberta. Encerre-a antes de abrir uma nova.
         </p>
       </div>

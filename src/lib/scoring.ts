@@ -68,6 +68,7 @@ export type FeelingRankingRow = {
   localId: number;
   nome: string;
   cidade: string;
+  fotoUrl: string;
   notaFeeling: number;
   totalVotos: number;
 };
@@ -95,6 +96,9 @@ export async function getFeelingRanking(): Promise<FeelingRankingRow[]> {
 
   const locais = await prisma.local.findMany({
     where: { id: { in: Array.from(somaPorLocal.keys()) } },
+    include: {
+      sessoes: { orderBy: { data: 'desc' }, take: 1, select: { fotoUrl: true } },
+    },
   });
 
   const rows: FeelingRankingRow[] = locais.map((local) => {
@@ -103,6 +107,7 @@ export async function getFeelingRanking(): Promise<FeelingRankingRow[]> {
       localId: local.id,
       nome: local.nome,
       cidade: local.cidade,
+      fotoUrl: local.sessoes[0]?.fotoUrl ?? PLACEHOLDER_PHOTO_URL,
       notaFeeling: entry.soma / entry.count,
       totalVotos: entry.count,
     };

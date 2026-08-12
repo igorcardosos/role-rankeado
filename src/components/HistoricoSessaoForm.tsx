@@ -106,7 +106,7 @@ export default function HistoricoSessaoForm({
             <button
               type="button"
               onClick={() => setModoLocal(modoLocal === 'novo' ? 'existente' : 'novo')}
-              className="text-sm text-brand-600 font-medium"
+              className="text-sm text-brand-600 dark:text-brand-400 font-medium"
             >
               {modoLocal === 'novo'
                 ? 'Já fomos lá? Escolher local existente'
@@ -116,17 +116,17 @@ export default function HistoricoSessaoForm({
         </div>
 
         {modoLocal === 'novo' ? (
-          <div className="bg-white rounded-2xl border border-gray-200 p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-4">
             {localCriado ? (
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold">{localCriado.nome}</p>
-                  <p className="text-xs text-gray-500">{localCriado.cidade}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{localCriado.cidade}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setLocalCriado(null)}
-                  className="text-sm text-gray-500"
+                  className="text-sm text-gray-500 dark:text-gray-400"
                 >
                   Trocar
                 </button>
@@ -145,7 +145,7 @@ export default function HistoricoSessaoForm({
           <select
             value={localIdSelecionado}
             onChange={(e) => setLocalIdSelecionado(Number(e.target.value))}
-            className="w-full rounded-xl border border-gray-300 px-4 py-3"
+            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-4 py-3"
           >
             {locaisList.map((l) => (
               <option key={l.id} value={l.id}>
@@ -162,7 +162,7 @@ export default function HistoricoSessaoForm({
           type="date"
           value={data}
           onChange={(e) => setData(e.target.value)}
-          className="w-full rounded-xl border border-gray-300 px-4 py-3"
+          className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-4 py-3"
           required
         />
       </div>
@@ -170,12 +170,15 @@ export default function HistoricoSessaoForm({
       <div className="space-y-4">
         <p className="font-medium text-sm">Avaliações de quem participou</p>
         {linhas.map((linha, idx) => (
-          <div key={idx} className="bg-white rounded-2xl border border-gray-200 p-4 space-y-4">
+          <div
+            key={idx}
+            className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-4 space-y-4"
+          >
             <div className="flex items-center gap-2">
               <select
                 value={linha.usuarioId}
                 onChange={(e) => atualizarLinha(idx, { usuarioId: Number(e.target.value) })}
-                className="flex-1 rounded-xl border border-gray-300 px-3 py-2.5"
+                className="flex-1 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-2.5"
                 required
               >
                 <option value="">Selecione o usuário</option>
@@ -189,7 +192,7 @@ export default function HistoricoSessaoForm({
                 <button
                   type="button"
                   onClick={() => removerLinha(idx)}
-                  className="text-red-500 text-sm px-2"
+                  className="text-red-500 dark:text-red-400 text-sm px-2"
                   aria-label="Remover linha"
                 >
                   ✕
@@ -239,13 +242,13 @@ export default function HistoricoSessaoForm({
         <button
           type="button"
           onClick={() => setLinhas((prev) => [...prev, novaLinha()])}
-          className="w-full rounded-xl border border-dashed border-gray-300 py-3 text-sm text-gray-500"
+          className="w-full rounded-xl border border-dashed border-gray-300 dark:border-gray-700 py-3 text-sm text-gray-500 dark:text-gray-400"
         >
           + Adicionar avaliação de outra pessoa
         </button>
       </div>
 
-      {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+      {error && <p className="text-red-600 dark:text-red-400 text-sm text-center">{error}</p>}
 
       <button
         type="submit"

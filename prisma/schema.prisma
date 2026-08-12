@@ -91,3 +91,9 @@ model FeelingVoto {
   @@unique([usuarioId, localId])
   @@index([usuarioId])
 }
+
+// Linha única (id sempre 1) com configurações globais editáveis pelo admin.
+model AppConfig {
+  id      Int    @id @default(1)
+  nomeApp String @default("Rolê Rankeado")
+}

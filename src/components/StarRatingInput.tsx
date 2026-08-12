@@ -19,7 +19,7 @@ export default function StarRatingInput({ label, value, onChange }: Props) {
             aria-label={`${n} estrelas`}
             className="text-3xl leading-none px-0.5"
           >
-            <span className={n <= value ? 'text-brand-500' : 'text-gray-300'}>★</span>
+            <span className={n <= value ? 'text-brand-500' : 'text-gray-300 dark:text-gray-600'}>★</span>
           </button>
         ))}
       </div>

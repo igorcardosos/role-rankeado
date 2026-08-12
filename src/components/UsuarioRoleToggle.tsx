@@ -32,7 +32,9 @@ export default function UsuarioRoleToggle({
       onClick={toggle}
       disabled={loading}
       className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-        papel === 'ADMIN' ? 'bg-brand-100 text-brand-700' : 'bg-gray-100 text-gray-600'
+        papel === 'ADMIN'
+          ? 'bg-brand-100 dark:bg-brand-900 text-brand-700 dark:text-brand-300'
+          : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'
       }`}
     >
       {papel}

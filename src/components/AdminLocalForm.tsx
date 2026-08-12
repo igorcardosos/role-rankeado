@@ -57,23 +57,23 @@ export default function AdminLocalForm({
         placeholder="Nome do local"
         value={nome}
         onChange={(e) => setNome(e.target.value)}
-        className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500"
+        className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500"
         required={!embedded}
       />
       <input
         placeholder="Cidade"
         value={cidade}
         onChange={(e) => setCidade(e.target.value)}
-        className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500"
+        className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500"
         required={!embedded}
       />
       <input
         placeholder="Endereço ou link do Google Maps (opcional)"
         value={endereco}
         onChange={(e) => setEndereco(e.target.value)}
-        className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500"
+        className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500"
       />
-      {error && <p className="text-red-600 text-sm">{error}</p>}
+      {error && <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>}
     </>
   );
 

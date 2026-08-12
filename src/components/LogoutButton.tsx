@@ -18,7 +18,7 @@ export default function LogoutButton() {
     <button
       onClick={handleLogout}
       disabled={loading}
-      className="text-sm text-gray-500 hover:text-gray-800 active:text-gray-900"
+      className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 active:text-gray-900 dark:active:text-gray-100"
     >
       Sair
     </button>

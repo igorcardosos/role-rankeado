@@ -26,7 +26,7 @@ export default function PhotoUploadField({
         // eslint-disable-next-line @next/next/no-img-element
         <img src={preview} alt="Prévia" className="w-full rounded-2xl object-cover max-h-64 mb-2" />
       ) : null}
-      <label className="flex items-center justify-center rounded-xl border-2 border-dashed border-gray-300 py-6 text-gray-500 text-sm cursor-pointer active:bg-gray-50">
+      <label className="flex items-center justify-center rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700 py-6 text-gray-500 dark:text-gray-400 text-sm cursor-pointer active:bg-gray-50 dark:active:bg-gray-800">
         {preview ? 'Trocar foto' : 'Tirar ou escolher foto'}
         <input
           type="file"

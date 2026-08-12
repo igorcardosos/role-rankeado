@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import PhoneInput from '@/components/PhoneInput';
 
 export default function AdminUserForm() {
   const router = useRouter();
@@ -35,32 +36,37 @@ export default function AdminUserForm() {
     }
   }
 
+  const inputClass =
+    'w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500';
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 bg-white rounded-2xl border border-gray-200 p-4">
-      <input
-        placeholder="Telefone"
-        inputMode="tel"
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-3 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-4"
+    >
+      <PhoneInput
+        placeholder="Ex: (31) 98534-7640"
         value={telefone}
-        onChange={(e) => setTelefone(e.target.value)}
-        className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500"
+        onChange={setTelefone}
+        className={inputClass}
         required
       />
       <input
         placeholder="Nome"
         value={nome}
         onChange={(e) => setNome(e.target.value)}
-        className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500"
+        className={inputClass}
         required
       />
       <select
         value={papel}
         onChange={(e) => setPapel(e.target.value as 'MEMBRO' | 'ADMIN')}
-        className="w-full rounded-xl border border-gray-300 px-4 py-3"
+        className={inputClass}
       >
         <option value="MEMBRO">Membro</option>
         <option value="ADMIN">Admin</option>
       </select>
-      {error && <p className="text-red-600 text-sm">{error}</p>}
+      {error && <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>}
       <button
         type="submit"
         disabled={loading}

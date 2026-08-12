@@ -48,7 +48,7 @@ export default function AvaliacaoForm({ sessaoId }: { sessaoId: number }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-5 bg-white rounded-2xl border border-gray-200 p-4">
+      <div className="space-y-5 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-4">
         <SliderInput
           label="Peixe"
           icon="🐟"
@@ -72,7 +72,7 @@ export default function AvaliacaoForm({ sessaoId }: { sessaoId: number }) {
         />
       </div>
 
-      <div className="space-y-4 bg-white rounded-2xl border border-gray-200 p-4">
+      <div className="space-y-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-4">
         <StarRatingInput
           label="Bem servido"
           value={values.estrelaBemServido}
@@ -90,7 +90,7 @@ export default function AvaliacaoForm({ sessaoId }: { sessaoId: number }) {
         />
       </div>
 
-      {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+      {error && <p className="text-red-600 dark:text-red-400 text-sm text-center">{error}</p>}
 
       <button
         type="submit"

@@ -1,0 +1,5 @@
+-- CreateTable
+CREATE TABLE "AppConfig" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT DEFAULT 1,
+    "nomeApp" TEXT NOT NULL DEFAULT 'Rolê Rankeado'
+);
