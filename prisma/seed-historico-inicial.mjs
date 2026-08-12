@@ -18,22 +18,19 @@ const MAX_NOTA_PEIXE = 5;
 const MAX_NOTA_MOLHO = 3;
 const MAX_NOTA_ACOMPANHAMENTO = 2;
 
-// TROQUE AQUI se os locais forem de cidades diferentes (edite o campo
-// "cidade" de cada item abaixo em vez de usar o padrão).
-const CIDADE_PADRAO = 'Preencher cidade';
 
 const RANKING = [
-  { nome: 'Bar do Sabão', nota: 7 },
-  { nome: 'No fogo', nota: 6.5 },
-  { nome: 'Peixe e Cia', nota: 6 },
-  { nome: 'Steak my House', nota: 6 },
-  { nome: 'Toca da Tilapia', nota: 5.5 },
-  { nome: 'Kayros', nota: 5.5 },
-  { nome: '88 Bros', nota: 5.5 },
-  { nome: 'Arena FuteBrasa', nota: 5.5 },
-  { nome: 'Flash Burguer', nota: 4.5 },
-  { nome: 'Portal Beer', nota: 4 },
-].map((item) => ({ ...item, cidade: CIDADE_PADRAO }));
+  { nome: 'Bar do Sabão', nota: 7, cidade: 'Contagem' },
+  { nome: 'No fogo', nota: 6.5, cidade: 'Juatuba' },
+  { nome: 'Peixe e Cia', nota: 6, cidade: 'Betim' },
+  { nome: 'Steak my House', nota: 6, cidade: 'Juatuba' },
+  { nome: 'Toca da Tilapia', nota: 5.5, cidade: 'Contagem' },
+  { nome: 'Kayros', nota: 5.5, cidade: 'Mateus Leme' },
+  { nome: '88 Bros', nota: 5.5, cidade: 'Betim' },
+  { nome: 'Arena FuteBrasa', nota: 5.5, cidade: 'Mateus Leme' },
+  { nome: 'Flash Burguer', nota: 4.5, cidade: 'Juatuba' },
+  { nome: 'Portal Beer', nota: 4, cidade: 'Juatuba' },
+];
 
 // Distribui a nota final entre os 3 critérios proporcionalmente ao peso de
 // cada um (5/3/2 de 10) — é só pra preencher a exibição por critério na
