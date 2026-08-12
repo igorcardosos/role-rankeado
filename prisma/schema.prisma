@@ -1,0 +1,93 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite não suporta enums nativos no Prisma — papel/status são String
+// validadas na aplicação (ver src/lib/validation.ts). Valores possíveis:
+// Papel: "ADMIN" | "MEMBRO"
+// SessaoStatus: "ABERTA" | "ENCERRADA"
+
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  telefone  String   @unique
+  nome      String
+  papel     String   @default("MEMBRO")
+  createdAt DateTime @default(now())
+
+  sessoesAbertas Sessao[]      @relation("SessaoAbertaPor")
+  avaliacoes     Avaliacao[]
+  feelingVotos   FeelingVoto[]
+
+  @@index([papel])
+}
+
+model Local {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  cidade    String
+  endereco  String?
+  createdAt DateTime @default(now())
+
+  sessoes      Sessao[]
+  feelingVotos FeelingVoto[]
+
+  @@index([cidade])
+}
+
+model Sessao {
+  id          Int          @id @default(autoincrement())
+  localId     Int
+  local       Local        @relation(fields: [localId], references: [id])
+  abertaPorId Int
+  abertaPor   Usuario      @relation("SessaoAbertaPor", fields: [abertaPorId], references: [id])
+  data        DateTime  @default(now())
+  status      String    @default("ABERTA")
+  fotoUrl     String
+  isHistorico Boolean   @default(false)
+  encerradaEm DateTime?
+  createdAt   DateTime  @default(now())
+
+  avaliacoes Avaliacao[]
+
+  @@index([localId])
+  @@index([status])
+  @@index([data])
+}
+
+model Avaliacao {
+  id                 Int      @id @default(autoincrement())
+  sessaoId           Int
+  sessao             Sessao   @relation(fields: [sessaoId], references: [id])
+  usuarioId          Int
+  usuario            Usuario  @relation(fields: [usuarioId], references: [id])
+  notaPeixe          Int
+  notaMolho          Int
+  notaAcompanhamento Int
+  estrelaBemServido  Int
+  estrelaAtendimento Int
+  estrelaLimpeza     Int
+  notaFinal          Float
+  createdAt          DateTime @default(now())
+
+  @@unique([sessaoId, usuarioId])
+  @@index([usuarioId])
+}
+
+model FeelingVoto {
+  id             Int      @id @default(autoincrement())
+  usuarioId      Int
+  usuario        Usuario  @relation(fields: [usuarioId], references: [id])
+  localId        Int
+  local          Local    @relation(fields: [localId], references: [id])
+  posicaoPessoal Int
+  updatedAt      DateTime @updatedAt
+
+  @@unique([usuarioId, localId])
+  @@index([usuarioId])
+}

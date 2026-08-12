@@ -1,0 +1,16 @@
+services:
+  app:
+    build: .
+    image: role-rankeado:latest
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - role_rankeado_data:/app/data
+      # Alternativa com bind-mount (backup direto no host):
+      # - ./data:/app/data
+
+volumes:
+  role_rankeado_data:
