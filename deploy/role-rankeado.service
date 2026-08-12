@@ -1,0 +1,22 @@
+[Unit]
+Description=Rolê Rankeado
+After=network.target
+
+[Service]
+Type=simple
+# Ajuste o caminho e o usuário conforme a sua VPS.
+WorkingDirectory=/opt/role-rankeado
+User=role-rankeado
+Group=role-rankeado
+
+# Roda as migrations e garante o admin antes de subir o servidor, toda vez
+# que o serviço inicia (equivalente ao docker-entrypoint.sh).
+ExecStartPre=/usr/bin/npx prisma migrate deploy
+ExecStartPre=/usr/bin/node prisma/seed.mjs
+ExecStart=/usr/bin/npm run start
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

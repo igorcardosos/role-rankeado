@@ -65,6 +65,85 @@ docker compose up -d --build
 
 Migrations novas rodam automaticamente no entrypoint antes do servidor subir.
 
+## Deploy em VPS sem Docker
+
+O app não depende de Docker pra nada — é só um processo Node.js normal. Se preferir instalar direto na VPS:
+
+1. **Instale o Node 20+** na VPS (ex: via [nvm](https://github.com/nvm-sh/nvm) ou o pacote oficial da distro).
+
+2. **Clone o projeto e instale as dependências:**
+
+   ```bash
+   git clone https://github.com/igorcardosos/role-rankeado.git /opt/role-rankeado
+   cd /opt/role-rankeado
+   npm install
+   ```
+
+3. **Configure o `.env`** (copie de `.env.example`). Como não tem volume Docker, use caminhos dentro do próprio projeto:
+
+   ```
+   DATABASE_URL="file:./data/db.sqlite"
+   UPLOADS_DIR="./data/uploads"
+   JWT_SECRET="gere-uma-string-longa-aleatoria"
+   SEED_ADMIN_PHONE="+55..."
+   SEED_ADMIN_NAME="Admin"
+   NODE_ENV="production"
+   PORT=3000
+   ```
+
+   Next.js carrega o `.env` automaticamente (build e runtime), então não precisa de nada extra pra isso funcionar.
+
+4. **Rode as migrations, garanta o admin e faça o build:**
+
+   ```bash
+   npx prisma migrate deploy
+   node prisma/seed.mjs
+   npm run build
+   ```
+
+5. **Suba o servidor.** Rodar `npm start` direto no terminal funciona pra testar, mas cai quando você fecha a sessão SSH — pra produção, use um gerenciador de processo. Tem um serviço `systemd` pronto em [`deploy/role-rankeado.service`](deploy/role-rankeado.service):
+
+   ```bash
+   sudo useradd -r -s /usr/sbin/nologin role-rankeado   # se ainda não existir
+   sudo chown -R role-rankeado:role-rankeado /opt/role-rankeado
+   sudo cp deploy/role-rankeado.service /etc/systemd/system/
+   # ajuste WorkingDirectory/User no arquivo se o caminho ou usuário forem outros
+   sudo systemctl daemon-reload
+   sudo systemctl enable --now role-rankeado
+   sudo systemctl status role-rankeado
+   ```
+
+   Isso já roda `prisma migrate deploy` + `seed.mjs` a cada start do serviço (mesmo comportamento do `docker-entrypoint.sh`), reinicia sozinho se cair, e sobe no boot da VPS.
+
+   Sem systemd, [PM2](https://pm2.keymetrics.io/) é a alternativa mais simples: `pm2 start npm --name role-rankeado -- start`.
+
+6. **Coloque um nginx na frente** (porta 80/443 → 3000) pra ter domínio e HTTPS. Tem um exemplo em [`deploy/nginx.conf`](deploy/nginx.conf):
+
+   ```bash
+   sudo cp deploy/nginx.conf /etc/nginx/sites-available/role-rankeado
+   # edite o server_name com seu domínio
+   sudo ln -s /etc/nginx/sites-available/role-rankeado /etc/nginx/sites-enabled/
+   sudo nginx -t && sudo systemctl reload nginx
+   sudo certbot --nginx -d seu-dominio.com   # HTTPS via Let's Encrypt
+   ```
+
+   A porta 3000 não precisa (e não deve) ficar exposta direto pra internet — só o nginx escuta 80/443 publicamente.
+
+### Atualizando (sem Docker)
+
+```bash
+cd /opt/role-rankeado
+git pull
+npm install
+npx prisma migrate deploy
+npm run build
+sudo systemctl restart role-rankeado
+```
+
+### Persistência de dados (sem Docker)
+
+O banco (`data/db.sqlite`) e as fotos (`data/uploads/`) ficam dentro da própria pasta do projeto — nada especial a configurar, só não apagar essa pasta num deploy futuro (o `git pull` não mexe em arquivos ignorados pelo git, então está seguro).
+
 ## Fluxo de uso
 
 1. Um admin cadastra os membros do grupo em `/admin/usuarios` (telefone + nome + papel).

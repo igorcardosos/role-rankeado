@@ -8,4 +8,4 @@ echo "Garantindo usuário admin (SEED_ADMIN_PHONE)..."
 node prisma/seed.mjs
 
 echo "Iniciando servidor..."
-exec node server.js
+exec ./node_modules/.bin/next start
