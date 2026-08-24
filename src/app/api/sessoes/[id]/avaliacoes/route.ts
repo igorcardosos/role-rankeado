@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { requireUser, AuthError } from '@/lib/auth';
 import { avaliacaoInputSchema } from '@/lib/validation';
@@ -35,26 +36,37 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     const notaFinal = computeNotaFinal(parsed.data);
 
-    const avaliacao = await prisma.$transaction(async (tx) => {
-      const created = await tx.avaliacao.create({
-        data: { sessaoId, usuarioId: session.sub, ...parsed.data, notaFinal },
-      });
-
-      const avaliacaoAnterior = await tx.avaliacao.findFirst({
-        where: { usuarioId: session.sub, sessao: { localId: sessao.localId }, id: { not: created.id } },
-      });
-
-      if (!avaliacaoAnterior) {
-        const totalVotos = await tx.feelingVoto.count({ where: { usuarioId: session.sub } });
-        await tx.feelingVoto.upsert({
-          where: { usuarioId_localId: { usuarioId: session.sub, localId: sessao.localId } },
-          update: {},
-          create: { usuarioId: session.sub, localId: sessao.localId, posicaoPessoal: totalVotos + 1 },
+    let avaliacao;
+    try {
+      avaliacao = await prisma.$transaction(async (tx) => {
+        const created = await tx.avaliacao.create({
+          data: { sessaoId, usuarioId: session.sub, ...parsed.data, notaFinal },
         });
-      }
 
-      return created;
-    });
+        const avaliacaoAnterior = await tx.avaliacao.findFirst({
+          where: { usuarioId: session.sub, sessao: { localId: sessao.localId }, id: { not: created.id } },
+        });
+
+        if (!avaliacaoAnterior) {
+          const totalVotos = await tx.feelingVoto.count({ where: { usuarioId: session.sub } });
+          await tx.feelingVoto.upsert({
+            where: { usuarioId_localId: { usuarioId: session.sub, localId: sessao.localId } },
+            update: {},
+            create: { usuarioId: session.sub, localId: sessao.localId, posicaoPessoal: totalVotos + 1 },
+          });
+        }
+
+        return created;
+      });
+    } catch (err) {
+      // Backstop contra corrida: a checagem "jaAvaliou" acima passou pros
+      // dois, mas a constraint única (sessaoId, usuarioId) garante que só
+      // uma das duas requisições concorrentes cria a avaliação de verdade.
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        return NextResponse.json({ error: 'Você já avaliou esta sessão.' }, { status: 409 });
+      }
+      throw err;
+    }
 
     return NextResponse.json(avaliacao, { status: 201 });
   } catch (err) {

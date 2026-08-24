@@ -3,20 +3,20 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PhoneInput from '@/components/PhoneInput';
+import { useSubmitGuard } from '@/lib/useSubmitGuard';
 
 export default function AdminUserForm() {
   const router = useRouter();
   const [telefone, setTelefone] = useState('');
   const [nome, setNome] = useState('');
   const [papel, setPapel] = useState<'MEMBRO' | 'ADMIN'>('MEMBRO');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { loading, run } = useSubmitGuard();
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setLoading(true);
-    try {
+    run(async () => {
       const res = await fetch('/api/usuarios', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -31,9 +31,7 @@ export default function AdminUserForm() {
       setNome('');
       setPapel('MEMBRO');
       router.refresh();
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 
   const inputClass =

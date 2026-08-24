@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSubmitGuard } from '@/lib/useSubmitGuard';
 
 type Local = { id: number; nome: string; cidade: string; endereco: string | null };
 
@@ -17,17 +18,16 @@ export default function AdminLocalForm({
   const [nome, setNome] = useState(local?.nome ?? '');
   const [cidade, setCidade] = useState(local?.cidade ?? '');
   const [endereco, setEndereco] = useState(local?.endereco ?? '');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { loading, run } = useSubmitGuard();
 
-  async function salvar() {
+  function salvar() {
     setError(null);
     if (!nome.trim() || !cidade.trim()) {
       setError('Preencha nome e cidade.');
       return;
     }
-    setLoading(true);
-    try {
+    run(async () => {
       const url = local ? `/api/locais/${local.id}` : '/api/locais';
       const res = await fetch(url, {
         method: local ? 'PATCH' : 'POST',
@@ -46,9 +46,7 @@ export default function AdminLocalForm({
         setEndereco('');
       }
       onSaved?.(saved);
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 
   const campos = (

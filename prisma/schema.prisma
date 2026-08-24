@@ -37,6 +37,8 @@ model Local {
   sessoes      Sessao[]
   feelingVotos FeelingVoto[]
 
+  // Evita duplicar o mesmo local por clique duplo/corrida (ver route handler).
+  @@unique([nome, cidade])
   @@index([cidade])
 }
 
@@ -66,9 +68,10 @@ model Avaliacao {
   sessao             Sessao   @relation(fields: [sessaoId], references: [id])
   usuarioId          Int
   usuario            Usuario  @relation(fields: [usuarioId], references: [id])
-  notaPeixe          Int
-  notaMolho          Int
-  notaAcompanhamento Int
+  // Aceitam meios-pontos (0.5) — validado em src/lib/validation.ts.
+  notaPeixe          Float
+  notaMolho          Float
+  notaAcompanhamento Float
   estrelaBemServido  Int
   estrelaAtendimento Int
   estrelaLimpeza     Int

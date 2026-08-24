@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSubmitGuard } from '@/lib/useSubmitGuard';
 
 export default function EncerrarSessaoButton({
   sessaoId,
@@ -11,16 +11,13 @@ export default function EncerrarSessaoButton({
   compact?: boolean;
 }) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const { loading, run } = useSubmitGuard();
 
-  async function handleClick() {
-    setLoading(true);
-    try {
+  function handleClick() {
+    run(async () => {
       await fetch(`/api/sessoes/${sessaoId}/encerrar`, { method: 'POST' });
       router.refresh();
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 
   if (compact) {

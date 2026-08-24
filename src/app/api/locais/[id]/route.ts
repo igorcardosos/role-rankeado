@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { requireAdminUser, AuthError } from '@/lib/auth';
 import { localUpdateSchema } from '@/lib/validation';
@@ -22,6 +23,17 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   } catch (err) {
     if (err instanceof AuthError) {
       return NextResponse.json({ error: err.message }, { status: err.status });
+    }
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err.code === 'P2002') {
+        return NextResponse.json(
+          { error: 'Já existe um local com esse nome nessa cidade.' },
+          { status: 409 }
+        );
+      }
+      if (err.code === 'P2025') {
+        return NextResponse.json({ error: 'Local não encontrado.' }, { status: 404 });
+      }
     }
     throw err;
   }
@@ -51,6 +63,11 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
   } catch (err) {
     if (err instanceof AuthError) {
       return NextResponse.json({ error: err.message }, { status: err.status });
+    }
+    // Clique duplo em excluir: a segunda chamada não acha mais o registro
+    // no meio da transação — trata como "já foi" em vez de 500.
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+      return NextResponse.json({ error: 'Local já foi excluído.' }, { status: 404 });
     }
     throw err;
   }

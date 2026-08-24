@@ -1,25 +1,22 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSubmitGuard } from '@/lib/useSubmitGuard';
 
 export default function DeleteLocalButton({ id, nome }: { id: number; nome: string }) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const { loading, run } = useSubmitGuard();
 
-  async function handleClick(e: React.MouseEvent) {
+  function handleClick(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
     if (!window.confirm(`Excluir "${nome}"? Isso apaga todas as sessões e avaliações desse local. Não dá pra desfazer.`)) {
       return;
     }
-    setLoading(true);
-    try {
+    run(async () => {
       await fetch(`/api/locais/${id}`, { method: 'DELETE' });
       router.refresh();
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 
   return (

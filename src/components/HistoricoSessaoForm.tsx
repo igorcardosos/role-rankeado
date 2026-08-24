@@ -6,6 +6,7 @@ import SliderInput from '@/components/SliderInput';
 import StarRatingInput from '@/components/StarRatingInput';
 import AdminLocalForm from '@/components/AdminLocalForm';
 import { MAX_NOTA_PEIXE, MAX_NOTA_MOLHO, MAX_NOTA_ACOMPANHAMENTO } from '@/lib/constants';
+import { useSubmitGuard } from '@/lib/useSubmitGuard';
 
 type Local = { id: number; nome: string; cidade: string; endereco: string | null };
 type Usuario = { id: number; nome: string };
@@ -23,9 +24,9 @@ type LinhaAvaliacao = {
 function novaLinha(): LinhaAvaliacao {
   return {
     usuarioId: '',
-    notaPeixe: Math.round(MAX_NOTA_PEIXE / 2),
-    notaMolho: Math.round(MAX_NOTA_MOLHO / 2),
-    notaAcompanhamento: Math.round(MAX_NOTA_ACOMPANHAMENTO / 2),
+    notaPeixe: MAX_NOTA_PEIXE / 2,
+    notaMolho: MAX_NOTA_MOLHO / 2,
+    notaAcompanhamento: MAX_NOTA_ACOMPANHAMENTO / 2,
     estrelaBemServido: 3,
     estrelaAtendimento: 3,
     estrelaLimpeza: 3,
@@ -46,8 +47,8 @@ export default function HistoricoSessaoForm({
   const [localIdSelecionado, setLocalIdSelecionado] = useState<number | ''>(locais[0]?.id ?? '');
   const [data, setData] = useState(() => new Date().toISOString().slice(0, 10));
   const [linhas, setLinhas] = useState<LinhaAvaliacao[]>([novaLinha()]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { loading, run } = useSubmitGuard();
 
   function atualizarLinha(idx: number, patch: Partial<LinhaAvaliacao>) {
     setLinhas((prev) => prev.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
@@ -59,7 +60,7 @@ export default function HistoricoSessaoForm({
 
   const localId = modoLocal === 'novo' ? localCriado?.id ?? '' : localIdSelecionado;
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
 
@@ -74,8 +75,7 @@ export default function HistoricoSessaoForm({
       return;
     }
 
-    setLoading(true);
-    try {
+    run(async () => {
       const res = await fetch('/api/sessoes/historico', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -92,9 +92,7 @@ export default function HistoricoSessaoForm({
       }
       router.push('/admin');
       router.refresh();
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 
   return (

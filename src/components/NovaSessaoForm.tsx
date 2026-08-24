@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PhotoUploadField from '@/components/PhotoUploadField';
 import AdminLocalForm from '@/components/AdminLocalForm';
+import { useSubmitGuard } from '@/lib/useSubmitGuard';
 
 type Local = { id: number; nome: string; cidade: string; endereco: string | null };
 
@@ -18,8 +19,8 @@ export default function NovaSessaoForm({ locais }: { locais: Local[] }) {
     locais[0]?.id ?? null
   );
   const [foto, setFoto] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { loading, run } = useSubmitGuard();
 
   function handleLocalCriado(novoLocal: Local) {
     setLocaisList((prev) => [...prev, novoLocal]);
@@ -28,7 +29,7 @@ export default function NovaSessaoForm({ locais }: { locais: Local[] }) {
 
   const localId = modo === 'novo' ? localCriado?.id ?? null : localIdSelecionado;
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     if (!localId) {
@@ -41,8 +42,7 @@ export default function NovaSessaoForm({ locais }: { locais: Local[] }) {
       setError('A foto do prato é obrigatória.');
       return;
     }
-    setLoading(true);
-    try {
+    run(async () => {
       const formData = new FormData();
       formData.set('localId', String(localId));
       formData.set('foto', foto);
@@ -54,9 +54,7 @@ export default function NovaSessaoForm({ locais }: { locais: Local[] }) {
       }
       router.push('/ranking');
       router.refresh();
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 
   return (

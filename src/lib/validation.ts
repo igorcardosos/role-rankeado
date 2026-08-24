@@ -23,9 +23,18 @@ export const localCreateSchema = z.object({
 
 export const localUpdateSchema = localCreateSchema.partial();
 
-const notaPeixe = z.coerce.number().int().min(0).max(MAX_NOTA_PEIXE);
-const notaMolho = z.coerce.number().int().min(0).max(MAX_NOTA_MOLHO);
-const notaAcompanhamento = z.coerce.number().int().min(0).max(MAX_NOTA_ACOMPANHAMENTO);
+// Aceita meios-pontos (0.5, 1, 1.5...) — nada além disso (sem 0.1, 0.2 etc).
+function notaComMeioPonto(max: number) {
+  return z.coerce
+    .number()
+    .min(0)
+    .max(max)
+    .refine((v) => Number.isInteger(v * 2), 'A nota só pode variar de 0.5 em 0.5.');
+}
+
+const notaPeixe = notaComMeioPonto(MAX_NOTA_PEIXE);
+const notaMolho = notaComMeioPonto(MAX_NOTA_MOLHO);
+const notaAcompanhamento = notaComMeioPonto(MAX_NOTA_ACOMPANHAMENTO);
 const estrela1a5 = z.coerce.number().int().min(1).max(5);
 
 export const avaliacaoInputSchema = z.object({

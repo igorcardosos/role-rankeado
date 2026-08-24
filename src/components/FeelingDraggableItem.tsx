@@ -25,8 +25,7 @@ export default function FeelingDraggableItem({ item, position }: { item: Feeling
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
-      className={`flex items-center gap-3 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 px-3 py-3 touch-none select-none ${
+      className={`flex items-center gap-2 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 pl-3 py-3 ${
         isDragging ? 'opacity-60 shadow-lg' : ''
       }`}
     >
@@ -43,9 +42,17 @@ export default function FeelingDraggableItem({ item, position }: { item: Feeling
         <p className="font-semibold truncate">{item.nome}</p>
         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{item.cidade}</p>
       </div>
-      <span aria-hidden className="text-gray-300 dark:text-gray-600 text-xl px-1 shrink-0">
+      {/* Alça de arraste isolada: só ela recebe os listeners/touch-action:none
+          do dnd-kit. O resto do card rola a página normalmente — antes o
+          card inteiro "roubava" o gesto de scroll do dedo no celular. */}
+      <button
+        type="button"
+        {...listeners}
+        aria-label={`Arrastar ${item.nome} pra reordenar`}
+        className="w-11 h-11 flex items-center justify-center shrink-0 text-gray-300 dark:text-gray-600 text-2xl touch-none cursor-grab active:cursor-grabbing"
+      >
         ⠿
-      </span>
+      </button>
     </li>
   );
 }

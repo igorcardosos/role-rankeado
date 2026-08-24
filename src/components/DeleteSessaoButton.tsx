@@ -1,23 +1,20 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSubmitGuard } from '@/lib/useSubmitGuard';
 
 export default function DeleteSessaoButton({ id, label }: { id: number; label: string }) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const { loading, run } = useSubmitGuard();
 
-  async function handleClick() {
+  function handleClick() {
     if (!window.confirm(`Excluir a sessão "${label}"? As avaliações dela saem do ranking. Não dá pra desfazer.`)) {
       return;
     }
-    setLoading(true);
-    try {
+    run(async () => {
       await fetch(`/api/sessoes/${id}`, { method: 'DELETE' });
       router.refresh();
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 
   return (

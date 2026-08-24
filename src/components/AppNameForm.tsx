@@ -2,21 +2,21 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSubmitGuard } from '@/lib/useSubmitGuard';
 
 export default function AppNameForm({ nomeAtual }: { nomeAtual: string }) {
   const router = useRouter();
   const [nome, setNome] = useState(nomeAtual);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [salvo, setSalvo] = useState(false);
+  const { loading, run } = useSubmitGuard();
 
-  async function salvar(e: React.FormEvent) {
+  function salvar(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setSalvo(false);
     if (!nome.trim()) return;
-    setLoading(true);
-    try {
+    run(async () => {
       const res = await fetch('/api/config', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -29,9 +29,7 @@ export default function AppNameForm({ nomeAtual }: { nomeAtual: string }) {
       }
       setSalvo(true);
       router.refresh();
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 
   return (

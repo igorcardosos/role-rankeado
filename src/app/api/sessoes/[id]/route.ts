@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { requireAdminUser, AuthError } from '@/lib/auth';
 
@@ -43,6 +44,9 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
   } catch (err) {
     if (err instanceof AuthError) {
       return NextResponse.json({ error: err.message }, { status: err.status });
+    }
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+      return NextResponse.json({ error: 'Sessão já foi excluída.' }, { status: 404 });
     }
     throw err;
   }

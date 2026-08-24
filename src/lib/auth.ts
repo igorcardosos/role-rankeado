@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
@@ -66,11 +67,14 @@ export function clearSessionCookie() {
   cookies().delete(SESSION_COOKIE_NAME);
 }
 
-export async function getSessionFromCookies(): Promise<SessionPayload | null> {
+// cache() deduplica dentro da mesma requisição — NavBar, OpenSessionBanner
+// e a página em si cada um chama isso na sua vez; sem isso seria verificar
+// o mesmo JWT 3-4 vezes por request.
+export const getSessionFromCookies = cache(async (): Promise<SessionPayload | null> => {
   const token = cookies().get(SESSION_COOKIE_NAME)?.value;
   if (!token) return null;
   return verifySession(token);
-}
+});
 
 export async function requireUser(): Promise<SessionPayload> {
   const session = await getSessionFromCookies();

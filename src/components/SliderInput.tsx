@@ -17,7 +17,7 @@ export default function SliderInput({ label, icon, value, max, onChange }: Props
           {label}
         </label>
         <span className="text-lg font-bold text-brand-600 dark:text-brand-400 tabular-nums">
-          {value}
+          {value.toFixed(1).replace(/\.0$/, '')}
           <span className="text-xs text-gray-400 dark:text-gray-500">/{max}</span>
         </span>
       </div>
@@ -25,7 +25,7 @@ export default function SliderInput({ label, icon, value, max, onChange }: Props
         type="range"
         min={0}
         max={max}
-        step={1}
+        step={0.5}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         className="w-full"

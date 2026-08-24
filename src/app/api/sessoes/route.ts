@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { requireAdminUser, AuthError } from '@/lib/auth';
 import { saveUploadedPhoto, UploadError } from '@/lib/upload';
@@ -31,15 +32,26 @@ export async function POST(req: NextRequest) {
 
     const fotoUrl = await saveUploadedPhoto(foto);
 
-    const sessao = await prisma.sessao.create({
-      data: {
-        localId,
-        abertaPorId: session.sub,
-        fotoUrl,
-        status: 'ABERTA',
-        isHistorico: false,
-      },
-    });
+    let sessao;
+    try {
+      sessao = await prisma.sessao.create({
+        data: {
+          localId,
+          abertaPorId: session.sub,
+          fotoUrl,
+          status: 'ABERTA',
+          isHistorico: false,
+        },
+      });
+    } catch (err) {
+      // Backstop contra corrida: a checagem acima passou pros dois, mas o
+      // índice único parcial (só 1 ABERTA por vez) no banco garante que só
+      // uma das duas requisições concorrentes consegue criar de fato.
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        return NextResponse.json({ error: 'Já existe uma sessão aberta.' }, { status: 409 });
+      }
+      throw err;
+    }
 
     return NextResponse.json(sessao, { status: 201 });
   } catch (err) {

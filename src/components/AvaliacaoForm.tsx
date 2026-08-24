@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import SliderInput from '@/components/SliderInput';
 import StarRatingInput from '@/components/StarRatingInput';
 import { MAX_NOTA_PEIXE, MAX_NOTA_MOLHO, MAX_NOTA_ACOMPANHAMENTO } from '@/lib/constants';
+import { useSubmitGuard } from '@/lib/useSubmitGuard';
 
 const initialState = {
-  notaPeixe: Math.round(MAX_NOTA_PEIXE / 2),
-  notaMolho: Math.round(MAX_NOTA_MOLHO / 2),
-  notaAcompanhamento: Math.round(MAX_NOTA_ACOMPANHAMENTO / 2),
+  notaPeixe: MAX_NOTA_PEIXE / 2,
+  notaMolho: MAX_NOTA_MOLHO / 2,
+  notaAcompanhamento: MAX_NOTA_ACOMPANHAMENTO / 2,
   estrelaBemServido: 3,
   estrelaAtendimento: 3,
   estrelaLimpeza: 3,
@@ -18,18 +19,17 @@ const initialState = {
 export default function AvaliacaoForm({ sessaoId }: { sessaoId: number }) {
   const router = useRouter();
   const [values, setValues] = useState(initialState);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { loading, run } = useSubmitGuard();
 
   function set<K extends keyof typeof initialState>(key: K, value: number) {
     setValues((prev) => ({ ...prev, [key]: value }));
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setLoading(true);
-    try {
+    run(async () => {
       const res = await fetch(`/api/sessoes/${sessaoId}/avaliacoes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -41,9 +41,7 @@ export default function AvaliacaoForm({ sessaoId }: { sessaoId: number }) {
         return;
       }
       router.refresh();
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 
   return (
