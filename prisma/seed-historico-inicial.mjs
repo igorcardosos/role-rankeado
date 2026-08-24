@@ -7,6 +7,7 @@
 // É idempotente: se um Local com o mesmo nome já existir, pula ele —
 // então dá pra rodar mais de uma vez sem duplicar.
 
+import { fileURLToPath } from 'url';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -19,7 +20,7 @@ const MAX_NOTA_MOLHO = 3;
 const MAX_NOTA_ACOMPANHAMENTO = 2;
 
 
-const RANKING = [
+export const RANKING = [
   { nome: 'Bar do Sabão', nota: 7, cidade: 'Contagem' },
   { nome: 'No fogo', nota: 6.5, cidade: 'Juatuba' },
   { nome: 'Peixe e Cia', nota: 6, cidade: 'Betim' },
@@ -104,11 +105,17 @@ async function main() {
   console.log('Importação do ranking histórico concluída.');
 }
 
-main()
-  .catch((err) => {
-    console.error('Falha ao importar ranking histórico:', err);
-    process.exitCode = 1;
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+// Só roda main() quando o arquivo é executado direto (`node
+// prisma/seed-historico-inicial.mjs`) — não quando outro script importa
+// RANKING daqui (ex: prisma/reassign-historico.mjs).
+const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
+if (isMainModule) {
+  main()
+    .catch((err) => {
+      console.error('Falha ao importar ranking histórico:', err);
+      process.exitCode = 1;
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}
