@@ -22,6 +22,7 @@ const MAX_NOTA_MOLHO = 3;
 const MAX_NOTA_ACOMPANHAMENTO = 2;
 
 const RANKING = [
+  { nome: 'Cascudão Peixe', nota: 8, cidade: 'Betim' },
   { nome: 'Bar do Sabão', nota: 7, cidade: 'Contagem' },
   { nome: 'No fogo', nota: 6.5, cidade: 'Juatuba' },
   { nome: 'Peixe e Cia', nota: 6, cidade: 'Betim' },
