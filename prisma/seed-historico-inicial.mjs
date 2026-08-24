@@ -1,4 +1,7 @@
 // Importa o ranking histórico que o grupo já tinha antes do app existir.
+// Lança a mesma nota pra TODOS os admins existentes (uma avaliação por
+// admin, por local) — não mexe em usuários/papéis, só replica o voto.
+//
 // Script de uso único — não roda automático (não é chamado pelo entrypoint
 // do Docker nem pelo systemd). Rode manualmente na VPS depois do deploy:
 //
@@ -7,7 +10,6 @@
 // É idempotente: se um Local com o mesmo nome já existir, pula ele —
 // então dá pra rodar mais de uma vez sem duplicar.
 
-import { fileURLToPath } from 'url';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -19,8 +21,7 @@ const MAX_NOTA_PEIXE = 5;
 const MAX_NOTA_MOLHO = 3;
 const MAX_NOTA_ACOMPANHAMENTO = 2;
 
-
-export const RANKING = [
+const RANKING = [
   { nome: 'Bar do Sabão', nota: 7, cidade: 'Contagem' },
   { nome: 'No fogo', nota: 6.5, cidade: 'Juatuba' },
   { nome: 'Peixe e Cia', nota: 6, cidade: 'Betim' },
@@ -47,11 +48,12 @@ function distribuirNota(nota) {
 }
 
 async function main() {
-  const admin = await prisma.usuario.findFirst({ where: { papel: 'ADMIN' } });
-  if (!admin) {
+  const admins = await prisma.usuario.findMany({ where: { papel: 'ADMIN' } });
+  if (admins.length === 0) {
     console.log('Nenhum admin encontrado — rode o seed normal (SEED_ADMIN_PHONE) primeiro.');
     return;
   }
+  console.log(`Lançando nota pra ${admins.length} admin(s): ${admins.map((a) => a.nome).join(', ')}`);
 
   for (const item of RANKING) {
     const jaExiste = await prisma.local.findFirst({
@@ -69,7 +71,7 @@ async function main() {
     const sessao = await prisma.sessao.create({
       data: {
         localId: local.id,
-        abertaPorId: admin.id,
+        abertaPorId: admins[0].id,
         status: 'ENCERRADA',
         isHistorico: true,
         fotoUrl: PLACEHOLDER_PHOTO_URL,
@@ -79,43 +81,39 @@ async function main() {
 
     const { peixe, molho, acompanhamento } = distribuirNota(item.nota);
 
-    await prisma.avaliacao.create({
-      data: {
-        sessaoId: sessao.id,
-        usuarioId: admin.id,
-        notaPeixe: peixe,
-        notaMolho: molho,
-        notaAcompanhamento: acompanhamento,
-        estrelaBemServido: 3,
-        estrelaAtendimento: 3,
-        estrelaLimpeza: 3,
-        notaFinal: item.nota,
-      },
-    });
+    for (const admin of admins) {
+      await prisma.avaliacao.create({
+        data: {
+          sessaoId: sessao.id,
+          usuarioId: admin.id,
+          notaPeixe: peixe,
+          notaMolho: molho,
+          notaAcompanhamento: acompanhamento,
+          estrelaBemServido: 3,
+          estrelaAtendimento: 3,
+          estrelaLimpeza: 3,
+          notaFinal: item.nota,
+        },
+      });
 
-    await prisma.feelingVoto.upsert({
-      where: { usuarioId_localId: { usuarioId: admin.id, localId: local.id } },
-      update: {},
-      create: { usuarioId: admin.id, localId: local.id, posicaoPessoal: 999 },
-    });
+      await prisma.feelingVoto.upsert({
+        where: { usuarioId_localId: { usuarioId: admin.id, localId: local.id } },
+        update: {},
+        create: { usuarioId: admin.id, localId: local.id, posicaoPessoal: 999 },
+      });
+    }
 
-    console.log(`Criado "${item.nome}" (nota ${item.nota}).`);
+    console.log(`Criado "${item.nome}" (nota ${item.nota}) para ${admins.length} admin(s).`);
   }
 
   console.log('Importação do ranking histórico concluída.');
 }
 
-// Só roda main() quando o arquivo é executado direto (`node
-// prisma/seed-historico-inicial.mjs`) — não quando outro script importa
-// RANKING daqui (ex: prisma/reassign-historico.mjs).
-const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
-if (isMainModule) {
-  main()
-    .catch((err) => {
-      console.error('Falha ao importar ranking histórico:', err);
-      process.exitCode = 1;
-    })
-    .finally(async () => {
-      await prisma.$disconnect();
-    });
-}
+main()
+  .catch((err) => {
+    console.error('Falha ao importar ranking histórico:', err);
+    process.exitCode = 1;
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
